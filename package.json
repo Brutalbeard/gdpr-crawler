@@ -1,7 +1,7 @@
 {
   "name": "gdpr-crawler",
   "version": "1.0.0",
-  "description": "Need to get some non-sense removed about you from a website? This bad boy can help.",
+  "description": "Need to get some nonsense removed about you from a website? This bad boy can help.",
   "main": "index.js",
   "bin": {
     "gdpr-crawler": "./index.js"

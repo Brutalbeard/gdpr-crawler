@@ -62,12 +62,12 @@ node index.js "Case No. 1:23-cv-12345-ABC" --max-results 5
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `-m, --max-results <number>` | Maximum number of search results to process | 10 |
-| `-o, --output <file>` | Output file name (without extension) | Console output |
-| `-f, --format <type>` | Output format: `json` or `csv` | json |
-| `-t, --timeout <ms>` | Request timeout in milliseconds | 10000 |
-| `-h, --help` | Display help information | - |
-| `-V, --version` | Display version number | - |
+| `-m, --max-results <number>` | Maximum number of search results to process | 10
+| `-o, --output <file>` | Output file name (without extension) | Console output
+| `-f, --format <type>` | Output format: `json` or `csv` | json
+| `-t, --timeout <ms>` | Request timeout in milliseconds | 10000
+| `-h, --help` | Display help information | -
+| `-V, --version` | Display version number | -
 
 ## Programmatic Usage
 

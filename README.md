@@ -1,6 +1,6 @@
 # gdpr-crawler
 
-Need to get some non-sense removed about you from a website? This bad boy can help.
+Need to get some nonsense removed about you from a website? This bad boy can help.
 
 A web crawler that searches for specific queries (like Federal Case Numbers) and extracts contact information from search results to help you reach out to website administrators for content removal requests.
 

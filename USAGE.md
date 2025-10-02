@@ -31,10 +31,28 @@ node index.js "Case No. 1:23-cv-12345-ABC"
 ```
 
 This will:
-1. Search for the case number online
+1. Search for the case number using DuckDuckGo (default)
 2. Visit each result page
 3. Extract contact information (emails and links)
 4. Display results in the console
+
+### Alternative: Using Google Search
+
+If you prefer Google search (note: may be blocked by some networks):
+
+```bash
+node index.js "DAT Solutions LLC v. Celoria" --search-engine google
+```
+
+### Crawling Specific URLs Directly
+
+If you already know which websites contain your information, or if search engines are blocked:
+
+```bash
+node index.js --urls "https://example1.com/case/12345" "https://example2.com/records" --output results --format json
+```
+
+This bypasses search entirely and crawls the provided URLs directly.
 
 ### Saving Results to a File
 
@@ -56,6 +74,22 @@ To process only the first 5 search results:
 
 ```bash
 node index.js "Case No. 1:23-cv-12345-ABC" --max-results 5
+```
+
+### Using Different Search Engines
+
+To use Google instead of DuckDuckGo (default):
+
+```bash
+node index.js "Case No. 1:23-cv-12345-ABC" --search-engine google
+```
+
+### Crawling Multiple URLs Directly
+
+To bypass search and crawl specific URLs:
+
+```bash
+node index.js --urls "https://site1.com/page" "https://site2.com/case" "https://site3.com/info" --output results
 ```
 
 ## Command-Line Options
@@ -192,13 +226,40 @@ If the search returns no results:
 - Try different search terms
 - Check if the search query is too specific or too broad
 - Verify internet connectivity
+- Try using a different search engine: `--search-engine google` or `--search-engine duckduckgo`
+- **If search engines are blocked**: Use the `--urls` option to crawl specific URLs directly
 
-### Connection Errors
+### Connection Errors / Search Engines Blocked
+
+If you see errors like "getaddrinfo ENOTFOUND www.google.com" or "ENOTFOUND html.duckduckgo.com":
+- Your network may be blocking search engine access
+- **Solution**: Use the `--urls` option to provide URLs directly:
+  ```bash
+  node index.js --urls "https://example.com/page1" "https://example.com/page2" --output results
+  ```
+- This bypasses search entirely and crawls the specific URLs you provide
+
+### How to Find URLs Manually
+
+If search engines are blocked, you can:
+1. Use your web browser to search for your case/information
+2. Copy the URLs of pages that contain your information
+3. Use the `--urls` option to crawl those specific pages
+4. Example:
+   ```bash
+   node index.js --urls \
+     "https://site1.com/case/12345" \
+     "https://site2.com/records/abc" \
+     "https://site3.com/info/xyz" \
+     --output my-results --format csv
+   ```
+
+### Connection Timeouts
 
 If you see connection errors:
 - Check your internet connection
 - Some websites may block automated requests
-- Try increasing the timeout value
+- Try increasing the timeout value: `--timeout 20000`
 
 ### Missing Contact Information
 

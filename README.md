@@ -32,11 +32,27 @@ npm install
 node index.js "<your search query>" [options]
 ```
 
+Or crawl specific URLs directly:
+
+```bash
+node index.js --urls <url1> <url2> ... [options]
+```
+
 ### Examples
 
 Search for a Federal Case Number:
 ```bash
 node index.js "Case No. 1:23-cv-12345"
+```
+
+Search using Google (may be blocked by some networks):
+```bash
+node index.js "Case No. 1:23-cv-12345" --search-engine google
+```
+
+Crawl specific URLs directly (recommended when search is unavailable):
+```bash
+node index.js --urls "https://example.com/case1" "https://example.com/case2" --output results --format csv
 ```
 
 Search with custom options:
@@ -46,10 +62,13 @@ node index.js "Case No. 1:23-cv-12345" --max-results 20 --output results --forma
 
 ### Options
 
+- `[query]` - Search query (optional if --urls is provided)
 - `-m, --max-results <number>` - Maximum number of search results to process (default: 10)
 - `-o, --output <file>` - Output file name without extension (default: console output)
 - `-f, --format <type>` - Output format: `json` or `csv` (default: json)
 - `-t, --timeout <ms>` - Request timeout in milliseconds (default: 10000)
+- `-s, --search-engine <engine>` - Search engine: `duckduckgo` or `google` (default: duckduckgo)
+- `-u, --urls <urls...>` - Crawl specific URLs directly instead of searching
 
 ### Output Format
 
@@ -82,19 +101,25 @@ Title,URL,Emails,Contact Links,Error
 
 ## How It Works
 
-1. **Search Phase**: Performs a web search using your query
-2. **Extraction Phase**: For each search result:
+1. **Search Phase** (optional): Performs a web search using your query with DuckDuckGo (default) or Google
+2. **Direct URL Phase** (alternative): If you provide URLs directly using `--urls`, skips search
+3. **Extraction Phase**: For each result or URL:
    - Extracts the page title and URL
    - Visits the page
    - Searches for email addresses in the HTML
    - Identifies links containing keywords like "contact", "legal", "privacy", etc.
-3. **Export Phase**: Outputs results in your chosen format
+4. **Export Phase**: Outputs results in your chosen format
 
 ## Important Notes
 
 ⚠️ **Rate Limiting**: The crawler includes a 1-second delay between requests to be respectful to web servers.
 
-⚠️ **Search Engine**: Currently uses Google search. Search engines may block automated requests. Consider using search engine APIs for production use.
+⚠️ **Search Engines**: 
+- **DuckDuckGo** (default): More privacy-friendly and less likely to be blocked
+- **Google**: May be blocked by some networks or require CAPTCHA verification
+- **Direct URLs**: Use the `--urls` option to bypass search entirely
+
+⚠️ **Network Restrictions**: If search engines are blocked on your network, use the `--urls` option to crawl specific URLs directly.
 
 ⚠️ **Legal Compliance**: Always ensure your use of this tool complies with applicable laws and website terms of service.
 

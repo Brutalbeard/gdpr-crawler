@@ -13,13 +13,14 @@ async function runExample() {
   // Create a crawler instance with custom options
   const crawler = new SearchResultsCrawler({
     maxResults: 5,  // Only process 5 results
-    timeout: 10000  // 10 second timeout
+    timeout: 10000,  // 10 second timeout
+    searchEngine: 'duckduckgo'  // Use DuckDuckGo (default)
   });
 
   // Example query - you can replace this with any search query
   const query = 'github open source GDPR privacy';
   
-  console.log(`Example: Searching for "${query}"\n`);
+  console.log(`Example 1: Searching for "${query}"\n`);
   
   try {
     // Perform the crawl
@@ -63,12 +64,35 @@ async function runExample() {
     // Export to JSON
     crawler.exportToJSON(results, 'example-results.json');
     
-    console.log('\nExample completed successfully!');
+    console.log('\nExample 1 completed!');
     console.log('Check example-results.json for the full output.\n');
     
   } catch (error) {
-    console.error('Example failed:', error.message);
-    process.exit(1);
+    console.error('Example 1 failed:', error.message);
+  }
+
+  // Example 2: Crawling specific URLs directly
+  console.log('\n' + '='.repeat(60));
+  console.log('Example 2: Crawling Specific URLs Directly');
+  console.log('='.repeat(60) + '\n');
+
+  try {
+    const urlsToCrawl = [
+      'https://www.example.com',
+      'https://www.example.org'
+    ];
+
+    const directResults = await crawler.crawlUrls(urlsToCrawl);
+    
+    console.log('\n' + '='.repeat(60));
+    console.log('DIRECT CRAWL RESULTS');
+    console.log('='.repeat(60) + '\n');
+    
+    console.log(`Crawled ${directResults.length} URLs directly`);
+    console.log('This method is useful when search engines are blocked.\n');
+    
+  } catch (error) {
+    console.error('Example 2 failed:', error.message);
   }
 }
 

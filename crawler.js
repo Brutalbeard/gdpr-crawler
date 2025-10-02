@@ -9,12 +9,80 @@ class SearchResultsCrawler {
     this.maxResults = options.maxResults || 10;
     this.timeout = options.timeout || 10000;
     this.userAgent = options.userAgent || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
+    this.searchEngine = options.searchEngine || 'duckduckgo'; // Changed default to DuckDuckGo
+  }
+
+  /**
+   * Perform a web search for the given query
+   */
+  async search(query) {
+    if (this.searchEngine === 'duckduckgo') {
+      return await this.searchDuckDuckGo(query);
+    } else if (this.searchEngine === 'google') {
+      return await this.searchGoogle(query);
+    } else {
+      console.error(`Unsupported search engine: ${this.searchEngine}`);
+      return [];
+    }
+  }
+
+  /**
+   * Perform a DuckDuckGo search for the given query
+   */
+  async searchDuckDuckGo(query) {
+    try {
+      const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+      const response = await axios.get(searchUrl, {
+        headers: {
+          'User-Agent': this.userAgent
+        },
+        timeout: this.timeout
+      });
+
+      const $ = cheerio.load(response.data);
+      const results = [];
+
+      // Extract search results from DuckDuckGo HTML version
+      $('.result__a').each((i, elem) => {
+        if (results.length >= this.maxResults) return false;
+        
+        const title = $(elem).text().trim();
+        const href = $(elem).attr('href');
+
+        if (title && href) {
+          try {
+            // DuckDuckGo uses redirect URLs, extract the actual URL
+            let cleanUrl = href;
+            if (href.startsWith('//duckduckgo.com/l/?')) {
+              const urlParams = new URLSearchParams(href.split('?')[1]);
+              cleanUrl = urlParams.get('uddg') || href;
+            }
+            
+            // Validate URL
+            new URL(cleanUrl);
+            
+            results.push({
+              title: title,
+              url: cleanUrl
+            });
+          } catch (error) {
+            // Skip invalid URLs
+          }
+        }
+      });
+
+      return results;
+    } catch (error) {
+      console.error('Error performing DuckDuckGo search:', error.message);
+      console.error('Tip: Try using --urls option to provide direct URLs instead of searching');
+      return [];
+    }
   }
 
   /**
    * Perform a Google search for the given query
    */
-  async search(query) {
+  async searchGoogle(query) {
     try {
       const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&num=${this.maxResults}`;
       const response = await axios.get(searchUrl, {
@@ -56,7 +124,8 @@ class SearchResultsCrawler {
 
       return results;
     } catch (error) {
-      console.error('Error performing search:', error.message);
+      console.error('Error performing Google search:', error.message);
+      console.error('Tip: Try using --search-engine duckduckgo or --urls option to provide direct URLs');
       return [];
     }
   }
@@ -162,6 +231,7 @@ class SearchResultsCrawler {
     
     if (searchResults.length === 0) {
       console.log('No search results found.');
+      console.log('\nTip: You can also provide URLs directly using crawlUrls() method or the --urls CLI option.');
       return [];
     }
 
@@ -178,6 +248,68 @@ class SearchResultsCrawler {
       const resultData = {
         title: result.title,
         url: result.url,
+        emails: contactInfo.emails || [],
+        contactLinks: contactInfo.contactLinks || []
+      };
+
+      if (contactInfo.error) {
+        resultData.error = contactInfo.error;
+      }
+
+      results.push(resultData);
+
+      // Display found contact information
+      if (contactInfo.emails && contactInfo.emails.length > 0) {
+        console.log(`  Emails found: ${contactInfo.emails.join(', ')}`);
+      }
+      if (contactInfo.contactLinks && contactInfo.contactLinks.length > 0) {
+        console.log(`  Contact links found: ${contactInfo.contactLinks.length}`);
+      }
+      if (contactInfo.error) {
+        console.log(`  Error: ${contactInfo.error}`);
+      }
+
+      // Be respectful with delays between requests
+      await this.sleep(1000);
+    }
+
+    return results;
+  }
+
+  /**
+   * Crawl specific URLs directly without searching
+   */
+  async crawlUrls(urls) {
+    console.log(`Crawling ${urls.length} URLs directly`);
+    console.log('=' .repeat(60));
+
+    const results = [];
+
+    for (const url of urls) {
+      console.log(`\nProcessing: ${url}`);
+
+      const contactInfo = await this.findContactLinks(url);
+      
+      // Try to get page title
+      let title = url;
+      try {
+        const response = await axios.get(url, {
+          headers: { 'User-Agent': this.userAgent },
+          timeout: this.timeout,
+          maxRedirects: 5
+        });
+        const $ = cheerio.load(response.data);
+        const pageTitle = $('title').text().trim();
+        if (pageTitle) {
+          title = pageTitle;
+        }
+      } catch (error) {
+        // Use URL as title if we can't fetch it
+      }
+
+      const resultData = {
+        title: title,
+        url: url,
         emails: contactInfo.emails || [],
         contactLinks: contactInfo.contactLinks || []
       };

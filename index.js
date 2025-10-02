@@ -11,19 +11,36 @@ program
   .version('1.0.0');
 
 program
-  .argument('<query>', 'Search query (e.g., Federal Case Number)')
+  .argument('[query]', 'Search query (e.g., Federal Case Number). Optional if --urls is provided.')
   .option('-m, --max-results <number>', 'Maximum number of search results to process', '10')
   .option('-o, --output <file>', 'Output file name (without extension)')
   .option('-f, --format <type>', 'Output format: json or csv', 'json')
   .option('-t, --timeout <ms>', 'Request timeout in milliseconds', '10000')
+  .option('-s, --search-engine <engine>', 'Search engine to use: duckduckgo or google', 'duckduckgo')
+  .option('-u, --urls <urls...>', 'Crawl specific URLs directly instead of searching')
   .action(async (query, options) => {
     try {
+      // Validate inputs
+      if (!query && !options.urls) {
+        console.error('Error: You must provide either a search query or URLs using --urls option');
+        process.exit(1);
+      }
+
       const crawler = new SearchResultsCrawler({
         maxResults: parseInt(options.maxResults),
-        timeout: parseInt(options.timeout)
+        timeout: parseInt(options.timeout),
+        searchEngine: options.searchEngine
       });
 
-      const results = await crawler.crawl(query);
+      let results;
+
+      if (options.urls) {
+        // Crawl specific URLs directly
+        results = await crawler.crawlUrls(options.urls);
+      } else {
+        // Perform search and crawl results
+        results = await crawler.crawl(query);
+      }
 
       // Export results
       if (options.output) {

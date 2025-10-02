@@ -28,7 +28,7 @@ program
 
       const crawler = new SearchResultsCrawler({
         maxResults: parseInt(options.maxResults),
-        timeout: parseInt(options.timeout),
+        timeout: Number(options.timeout),
         searchEngine: options.searchEngine
       });
 

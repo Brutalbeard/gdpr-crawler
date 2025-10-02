@@ -53,8 +53,21 @@ class SearchResultsCrawler {
           try {
             // DuckDuckGo uses redirect URLs, extract the actual URL
             let cleanUrl = href;
-            if (href.startsWith('//duckduckgo.com/l/?')) {
-              const urlParams = new URLSearchParams(href.split('?')[1]);
+            // Handle DuckDuckGo redirect links in all forms
+            const duckDuckGoOrigin = 'https://duckduckgo.com';
+            if (
+              href.startsWith('/l/?') ||
+              href.startsWith('https://duckduckgo.com/l/?') ||
+              href.startsWith('//duckduckgo.com/l/?')
+            ) {
+              // Resolve relative and protocol-relative links
+              let resolvedHref = href;
+              if (href.startsWith('/l/?')) {
+                resolvedHref = duckDuckGoOrigin + href;
+              } else if (href.startsWith('//duckduckgo.com/l/?')) {
+                resolvedHref = 'https:' + href;
+              }
+              const urlParams = new URLSearchParams(resolvedHref.split('?')[1]);
               cleanUrl = urlParams.get('uddg') || href;
             }
             

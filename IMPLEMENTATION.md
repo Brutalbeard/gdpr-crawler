@@ -17,7 +17,7 @@ A complete Node.js command-line tool with the following components:
 
 1. **crawler.js** (7KB)
    - Main SearchResultsCrawler class
-   - Performs web searches via Google
+   - Performs web searches via DuckDuckGo (default) and Google
    - Extracts page titles and URLs from search results
    - Crawls each result page to find contact information
    - Identifies email addresses using regex patterns

@@ -137,3 +137,11 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Crawler output files
+results.json
+results.csv
+example-results.json
+*-results.json
+*-results.csv
+

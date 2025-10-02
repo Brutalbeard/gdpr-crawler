@@ -1,0 +1,27 @@
+{
+  "name": "gdpr-crawler",
+  "version": "1.0.0",
+  "description": "Need to get some nonsense removed about you from a website? This bad boy can help.",
+  "main": "index.js",
+  "bin": {
+    "gdpr-crawler": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "crawler",
+    "web-scraper",
+    "gdpr",
+    "contact-finder",
+    "search"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "cheerio": "^1.1.2",
+    "commander": "^14.0.1"
+  }
+}
